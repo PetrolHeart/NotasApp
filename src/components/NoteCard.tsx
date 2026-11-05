@@ -5,6 +5,7 @@ import { motion, useMotionValue, useTransform, type PanInfo } from 'framer-motio
 import { useStore } from '@/store/useStore';
 import type { Note } from '@/types';
 import { getChecklistProgress, getNotePreview, formatDate, cn } from '@/lib/utils';
+import { formatReminderText } from '@/lib/reminderService';
 
 interface NoteCardProps {
   note: Note;
@@ -190,6 +191,24 @@ export default function NoteCard({
               </motion.button>
             )}
           </div>
+
+          {/* Insignia de Recordatorio si existe */}
+          {note.reminder && (
+            <div className="mb-2">
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-2xs transition-all',
+                  note.reminder.isTriggered
+                    ? 'bg-black/5 dark:bg-white/10 text-zinc-500 dark:text-zinc-400'
+                    : 'bg-blue-600 text-white'
+                )}
+              >
+                <span>{note.reminder.isTriggered ? '🔔' : '⏰'}</span>
+                <span>{formatReminderText(note.reminder.dateTime)}</span>
+                {note.reminder.isTriggered && <span className="opacity-75">✓</span>}
+              </span>
+            </div>
+          )}
 
           {/* Vista previa de texto */}
           {preview && (

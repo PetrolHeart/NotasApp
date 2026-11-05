@@ -1,10 +1,16 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import { DEFAULT_TAG_COLORS } from '@/types';
 import { INITIAL_NOTES, INITIAL_TAGS } from '@/lib/storage';
+import {
+  getNotificationPermissionStatus,
+  requestNotificationPermission,
+  showLocalNotification,
+  type NotificationStatus,
+} from '@/lib/reminderService';
 
 export default function SettingsPanel() {
   const {
@@ -27,7 +33,51 @@ export default function SettingsPanel() {
   const [exportStatus, setExportStatus] = useState('');
   const [importStatus, setImportStatus] = useState('');
   const [isImporting, setIsImporting] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationStatus>('default');
+  const [testNotificationStatus, setTestNotificationStatus] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isSettingsOpen) {
+      setNotificationPermission(getNotificationPermissionStatus());
+    }
+  }, [isSettingsOpen]);
+
+  const handleRequestPermission = async () => {
+    const res = await requestNotificationPermission();
+    setNotificationPermission(res);
+    if (res === 'granted') {
+      setTestNotificationStatus('✅ Permiso concedido');
+      setTimeout(() => setTestNotificationStatus(''), 3000);
+    } else if (res === 'denied') {
+      setTestNotificationStatus('❌ Permiso denegado por el navegador');
+      setTimeout(() => setTestNotificationStatus(''), 4000);
+    }
+  };
+
+  const handleTestNotification = async () => {
+    if (notificationPermission !== 'granted') {
+      const res = await requestNotificationPermission();
+      setNotificationPermission(res);
+      if (res !== 'granted') {
+        setTestNotificationStatus('⚠️ Se necesita permiso para enviar notificaciones.');
+        setTimeout(() => setTestNotificationStatus(''), 3000);
+        return;
+      }
+    }
+
+    const success = await showLocalNotification(
+      '🔔 Notificación de prueba',
+      '¡Tu sistema de alarmas y recordatorios locales está funcionando correctamente en AppNotas!'
+    );
+
+    if (success) {
+      setTestNotificationStatus('✅ Notificación enviada');
+    } else {
+      setTestNotificationStatus('❌ No se pudo enviar la notificación');
+    }
+    setTimeout(() => setTestNotificationStatus(''), 3000);
+  };
 
   const handleExport = async () => {
     try {
@@ -83,6 +133,24 @@ export default function SettingsPanel() {
       await loadAll();
     }
   };
+
+  const getPermissionLabel = () => {
+    switch (notificationPermission) {
+      case 'granted':
+        return { label: 'Concedido', color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40' };
+      case 'denied':
+        return { label: 'Bloqueado', color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40' };
+      case 'unsupported':
+        return { label: 'No soportado', color: 'text-zinc-500 bg-zinc-100 dark:bg-zinc-800' };
+      default:
+        return { label: 'Pendiente', color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40' };
+    }
+  };
+
+  const permBadge = getPermissionLabel();
+  const pendingRemindersCount = notes.filter(
+    (n) => n.reminder && !n.reminder.isTriggered && !n.isTrashed && !n.isArchived
+  ).length;
 
   return (
     <AnimatePresence>
@@ -151,6 +219,57 @@ export default function SettingsPanel() {
                     value={settings.viewMode === 'list'}
                     onChange={(v) => updateSettings({ viewMode: v ? 'list' : 'grid' })}
                   />
+                </div>
+              </section>
+
+              {/* Recordatorios y Notificaciones */}
+              <section>
+                <h3 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3">
+                  Recordatorios y Alarmas
+                </h3>
+                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/50 dark:border-zinc-700/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xl">🔔</span>
+                      <div>
+                        <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 block">
+                          Notificaciones Locales
+                        </span>
+                        <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                          {pendingRemindersCount} {pendingRemindersCount === 1 ? 'recordatorio pendiente' : 'recordatorios pendientes'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${permBadge.color}`}>
+                      {permBadge.label}
+                    </span>
+                  </div>
+
+                  {testNotificationStatus && (
+                    <p className="text-xs text-center font-semibold text-blue-600 dark:text-blue-400 py-1">
+                      {testNotificationStatus}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    {notificationPermission !== 'granted' && notificationPermission !== 'unsupported' ? (
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleRequestPermission}
+                        className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors"
+                      >
+                        Activar Notificaciones
+                      </motion.button>
+                    ) : null}
+
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleTestNotification}
+                      className="w-full py-2 px-3 rounded-xl bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-800 dark:text-zinc-200 font-bold text-xs transition-colors"
+                    >
+                      Probar Notificación
+                    </motion.button>
+                  </div>
                 </div>
               </section>
 

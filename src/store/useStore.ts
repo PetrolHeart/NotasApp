@@ -1,9 +1,10 @@
 'use client';
 
 import { create } from 'zustand';
-import type { Note, Tag, AppSettings, FilterMode, ContentBlock, ChecklistItem } from '@/types';
+import type { Note, Tag, AppSettings, FilterMode, ContentBlock, ChecklistItem, NoteReminder } from '@/types';
 import { indexedDBRepository, type NoteRepository, INITIAL_SETTINGS } from '@/lib/storage';
 import { DEFAULT_THEMES } from '@/types';
+import { checkAndTriggerDueReminders } from '@/lib/reminderService';
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
@@ -40,6 +41,11 @@ interface AppState {
   trashNote: (id: string) => Promise<void>;
   emptyTrash: () => Promise<void>;
   reorderNotes: (noteIds: string[]) => Promise<void>;
+
+  // Recordatorios y Alarmas
+  setNoteReminder: (noteId: string, reminder: NoteReminder | null) => Promise<void>;
+  markReminderTriggered: (noteId: string) => Promise<void>;
+  checkReminders: () => Promise<void>;
 
   // Content Blocks
   addBlock: (noteId: string, type: 'text' | 'checklist') => Promise<void>;
@@ -108,6 +114,8 @@ export const useStore = create<AppState>((set, get) => ({
         repo.getSettings(),
       ]);
       set({ notes, tags, settings, isLoaded: true });
+      // Comprobar alarmas al cargar
+      get().checkReminders();
     } catch {
       set({ isLoaded: true });
     }
@@ -126,12 +134,12 @@ export const useStore = create<AppState>((set, get) => ({
       isPinned: partial.isPinned || false,
       isArchived: false,
       isTrashed: false,
-      order: 0, // Put new notes at the top
+      reminder: partial.reminder || null,
+      order: 0,
       createdAt: now,
       updatedAt: now,
     };
 
-    // Increment existing note orders
     const updatedNotes = [newNote, ...get().notes.map((n) => ({ ...n, order: n.order + 1 }))];
     set({ notes: updatedNotes });
     await get().repo.saveNote(newNote);
@@ -196,6 +204,28 @@ export const useStore = create<AppState>((set, get) => ({
 
     set({ notes });
     await get().repo.saveAllNotes(notes);
+  },
+
+  async setNoteReminder(noteId, reminder) {
+    await get().updateNote(noteId, { reminder });
+  },
+
+  async markReminderTriggered(noteId) {
+    const note = get().notes.find((n) => n.id === noteId);
+    if (note && note.reminder) {
+      const updatedReminder: NoteReminder = {
+        ...note.reminder,
+        isTriggered: true,
+      };
+      await get().updateNote(noteId, { reminder: updatedReminder });
+    }
+  },
+
+  async checkReminders() {
+    const notes = get().notes;
+    await checkAndTriggerDueReminders(notes, async (noteId) => {
+      await get().markReminderTriggered(noteId);
+    });
   },
 
   async addBlock(noteId, type) {

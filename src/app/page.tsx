@@ -11,13 +11,13 @@ import TagManagerModal from '@/components/TagManagerModal';
 import BottomNav from '@/components/BottomNav';
 
 export default function Home() {
-  const { isLoaded, loadAll, settings } = useStore();
+  const { isLoaded, loadAll, settings, checkReminders } = useStore();
 
   useEffect(() => {
     loadAll();
   }, [loadAll]);
 
-  // Apply dark mode
+  // Aplicar modo oscuro
   useEffect(() => {
     if (settings.darkMode) {
       document.documentElement.classList.add('dark');
@@ -26,12 +26,23 @@ export default function Home() {
     }
   }, [settings.darkMode]);
 
-  // Register service worker
+  // Registrar Service Worker para PWA y notificaciones
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
   }, []);
+
+  // Temporizador en segundo plano para comprobar y disparar recordatorios cada 30 segundos
+  useEffect(() => {
+    if (!isLoaded) return;
+    // Comprobación inicial al montar
+    checkReminders();
+    const interval = setInterval(() => {
+      checkReminders();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [isLoaded, checkReminders]);
 
   if (!isLoaded) {
     return (

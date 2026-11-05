@@ -3,9 +3,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/store/useStore';
-import type { NoteTheme, ContentBlock, ChecklistItem } from '@/types';
+import type { NoteTheme, ContentBlock, ChecklistItem, NoteReminder } from '@/types';
 import { DEFAULT_THEMES, DEFAULT_TAG_COLORS } from '@/types';
 import { cn, getChecklistProgress } from '@/lib/utils';
+import {
+  requestNotificationPermission,
+  getNotificationPermissionStatus,
+  formatReminderText,
+  getQuickReminderISO,
+  toDatetimeLocalValue,
+} from '@/lib/reminderService';
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 9);
@@ -32,11 +39,14 @@ export default function NoteEditor() {
   const [noteIcon, setNoteIcon] = useState('');
   const [isPinned, setIsPinned] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  const [reminder, setReminder] = useState<NoteReminder | null>(null);
 
   // Paneles flotantes
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
+  const [showReminderPicker, setShowReminderPicker] = useState(false);
   const [newTagName, setNewTagName] = useState('');
+  const [permissionNotice, setPermissionNotice] = useState('');
 
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +63,7 @@ export default function NoteEditor() {
         setNoteIcon(editingNote.theme?.icon || '');
         setIsPinned(editingNote.isPinned || false);
         setSelectedTagIds(editingNote.tags ? editingNote.tags.map((t) => t.id) : []);
+        setReminder(editingNote.reminder || null);
       } else {
         setTitle('');
         setBlocks([{ id: generateId(), type: 'text', content: '', order: 0 }]);
@@ -60,9 +71,12 @@ export default function NoteEditor() {
         setNoteIcon('');
         setIsPinned(false);
         setSelectedTagIds([]);
+        setReminder(null);
       }
       setShowThemePicker(false);
       setShowTagPicker(false);
+      setShowReminderPicker(false);
+      setPermissionNotice('');
       setTimeout(() => titleInputRef.current?.focus(), 250);
     }
   }, [isEditorOpen, editingNote]);
@@ -95,6 +109,7 @@ export default function NoteEditor() {
         theme: noteTheme,
         tags: noteTags,
         isPinned,
+        reminder,
       });
     } else {
       await addNote({
@@ -103,10 +118,34 @@ export default function NoteEditor() {
         theme: noteTheme,
         tags: noteTags,
         isPinned,
+        reminder,
       });
     }
 
     closeEditor();
+  };
+
+  const handleSetReminder = async (dateTimeISO: string) => {
+    // Solicitar permiso de notificación si aún no ha sido concedido
+    const permStatus = getNotificationPermissionStatus();
+    if (permStatus !== 'granted' && permStatus !== 'unsupported') {
+      const res = await requestNotificationPermission();
+      if (res === 'denied') {
+        setPermissionNotice('⚠️ Las notificaciones están bloqueadas en tu navegador. Actívalas en los ajustes del sitio para recibir avisos.');
+      } else if (res === 'granted') {
+        setPermissionNotice('✅ ¡Permiso de notificación concedido!');
+        setTimeout(() => setPermissionNotice(''), 3000);
+      }
+    }
+
+    setReminder({
+      dateTime: dateTimeISO,
+      isTriggered: false,
+    });
+  };
+
+  const handleClearReminder = () => {
+    setReminder(null);
   };
 
   const handleAddBlock = (type: 'text' | 'checklist') => {
@@ -251,6 +290,30 @@ export default function NoteEditor() {
               </motion.button>
 
               <div className="flex items-center gap-1 sm:gap-2">
+                {/* Botón Recordatorio */}
+                <motion.button
+                  whileTap={{ scale: 0.88 }}
+                  onClick={() => {
+                    setShowReminderPicker(!showReminderPicker);
+                    setShowThemePicker(false);
+                    setShowTagPicker(false);
+                  }}
+                  className={cn(
+                    'w-9 h-9 rounded-xl flex items-center justify-center text-sm transition-colors relative',
+                    reminder
+                      ? 'bg-blue-600 text-white font-bold shadow-xs'
+                      : showReminderPicker
+                      ? 'bg-black/15 dark:bg-white/20'
+                      : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-70'
+                  )}
+                  title="Configurar recordatorio y notificación"
+                >
+                  ⏰
+                  {reminder && !reminder.isTriggered && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white dark:ring-zinc-900" />
+                  )}
+                </motion.button>
+
                 {/* Botón Fijar Nota */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
@@ -266,12 +329,13 @@ export default function NoteEditor() {
                   📌
                 </motion.button>
 
-                {/* Alternar selector de tema y color */}
+                {/* Selector de tema y color */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => {
                     setShowThemePicker(!showThemePicker);
                     setShowTagPicker(false);
+                    setShowReminderPicker(false);
                   }}
                   className={cn(
                     'w-9 h-9 rounded-xl flex items-center justify-center text-sm transition-colors',
@@ -284,12 +348,13 @@ export default function NoteEditor() {
                   🎨
                 </motion.button>
 
-                {/* Alternar selector de etiquetas */}
+                {/* Selector de etiquetas */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => {
                     setShowTagPicker(!showTagPicker);
                     setShowThemePicker(false);
+                    setShowReminderPicker(false);
                   }}
                   className={cn(
                     'w-9 h-9 rounded-xl flex items-center justify-center text-sm transition-colors',
@@ -325,6 +390,106 @@ export default function NoteEditor() {
                 )}
               </div>
             </div>
+
+            {/* Panel de Recordatorio y Notificaciones */}
+            <AnimatePresence>
+              {showReminderPicker && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="px-6 py-4 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/10 overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wider opacity-60 flex items-center gap-1.5">
+                      <span>⏰</span>
+                      <span>Recordatorio y Alarma</span>
+                    </p>
+                    {reminder && (
+                      <button
+                        onClick={handleClearReminder}
+                        className="text-[11px] font-semibold text-rose-500 hover:underline"
+                      >
+                        Quitar recordatorio
+                      </button>
+                    )}
+                  </div>
+
+                  {permissionNotice && (
+                    <p className="text-xs mb-2 text-zinc-600 dark:text-zinc-300 bg-black/5 dark:bg-white/5 p-2 rounded-xl">
+                      {permissionNotice}
+                    </p>
+                  )}
+
+                  {/* Estado actual del recordatorio */}
+                  {reminder && (
+                    <div className="flex items-center justify-between p-2.5 mb-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs">
+                      <span className="font-semibold flex items-center gap-1.5">
+                        <span>🔔</span>
+                        <span>Programado: {formatReminderText(reminder.dateTime)}</span>
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500 text-white font-bold">
+                        {reminder.isTriggered ? 'Completado' : 'Pendiente'}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Botones de Acceso Rápido */}
+                  <p className="text-[10px] uppercase font-bold opacity-40 mb-1.5">Accesos rápidos:</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleSetReminder(getQuickReminderISO('in_one_hour'))}
+                      className="px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 shadow-xs border border-black/5 dark:border-white/10 text-xs font-semibold text-left hover:border-blue-500 transition-colors"
+                    >
+                      <span className="block opacity-50 text-[10px]">Pronto</span>
+                      <span>En 1 hora</span>
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleSetReminder(getQuickReminderISO('today_evening'))}
+                      className="px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 shadow-xs border border-black/5 dark:border-white/10 text-xs font-semibold text-left hover:border-blue-500 transition-colors"
+                    >
+                      <span className="block opacity-50 text-[10px]">Tarde</span>
+                      <span>Hoy a las 18:00</span>
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleSetReminder(getQuickReminderISO('tomorrow_morning'))}
+                      className="px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 shadow-xs border border-black/5 dark:border-white/10 text-xs font-semibold text-left hover:border-blue-500 transition-colors"
+                    >
+                      <span className="block opacity-50 text-[10px]">Mañana</span>
+                      <span>A las 09:00</span>
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleSetReminder(getQuickReminderISO('next_monday'))}
+                      className="px-2.5 py-2 rounded-xl bg-white dark:bg-zinc-800 shadow-xs border border-black/5 dark:border-white/10 text-xs font-semibold text-left hover:border-blue-500 transition-colors"
+                    >
+                      <span className="block opacity-50 text-[10px]">Semana próxima</span>
+                      <span>Lunes 09:00</span>
+                    </motion.button>
+                  </div>
+
+                  {/* Selector Manual de Fecha y Hora */}
+                  <div>
+                    <label className="text-[10px] uppercase font-bold opacity-40 mb-1 block">
+                      O selecciona fecha y hora personalizada:
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={toDatetimeLocalValue(reminder?.dateTime)}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleSetReminder(new Date(e.target.value).toISOString());
+                        }
+                      }}
+                      className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/20 text-xs font-medium outline-none text-zinc-900 dark:text-zinc-100"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Selector de tema e icono */}
             <AnimatePresence>
@@ -471,10 +636,16 @@ export default function NoteEditor() {
                 />
               </div>
 
-              {/* Chips de etiquetas en la cabecera */}
-              {selectedTagIds.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-1 mb-2">
-                  {tags
+              {/* Chips de etiquetas y recordatorio activo en cabecera */}
+              <div className="flex flex-wrap items-center gap-1.5 mt-1 mb-2">
+                {reminder && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-600 text-white flex items-center gap-1 shadow-xs">
+                    <span>⏰</span>
+                    <span>{formatReminderText(reminder.dateTime)}</span>
+                  </span>
+                )}
+                {selectedTagIds.length > 0 &&
+                  tags
                     .filter((t) => selectedTagIds.includes(t.id))
                     .map((tag) => (
                       <span
@@ -485,8 +656,7 @@ export default function NoteEditor() {
                         #{tag.name}
                       </span>
                     ))}
-                </div>
-              )}
+              </div>
 
               {/* Barra de progreso de la lista en tiempo real */}
               {progress.total > 0 && (

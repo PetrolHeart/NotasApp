@@ -8,14 +8,14 @@ export interface ChecklistItem {
 export interface ContentBlock {
   id: string;
   type: 'text' | 'checklist';
-  content: string; // For text blocks, the text or markdown content
-  checklistItems?: ChecklistItem[]; // For checklist blocks
+  content: string; // Para bloques de texto, el contenido
+  checklistItems?: ChecklistItem[]; // Para bloques de lista de tareas
   order: number;
 }
 
 export interface NoteTheme {
-  background: string; // Tailwind gradient or color class
-  icon?: string; // Emoji or icon identifier
+  background: string; // Clase de degradado o color de Tailwind
+  icon?: string; // Emoji o identificador de icono
   textColor?: string;
   accentColor?: string;
 }
@@ -23,7 +23,12 @@ export interface NoteTheme {
 export interface Tag {
   id: string;
   name: string;
-  color: string; // Hex or CSS color
+  color: string; // Hex o color CSS
+}
+
+export interface NoteReminder {
+  dateTime: string; // Formato ISO String
+  isTriggered: boolean;
 }
 
 export interface Note {
@@ -38,6 +43,7 @@ export interface Note {
   order: number;
   createdAt: number;
   updatedAt: number;
+  reminder?: NoteReminder | null;
 }
 
 export type FilterMode = 'all' | 'archived' | 'trash';

@@ -25,10 +25,10 @@ export default function BottomNav() {
   };
 
   const navItems = [
-    { id: 'all', label: 'Notes', icon: '📝', isActive: filterMode === 'all' && selectedTagIds.length === 0 },
-    { id: 'tags', label: 'Tags', icon: '🏷️', isActive: selectedTagIds.length > 0, badge: selectedTagIds.length || undefined },
-    { id: 'archived', label: 'Archived', icon: '📦', isActive: filterMode === 'archived' },
-    { id: 'settings', label: 'Settings', icon: '⚙️', isActive: false },
+    { id: 'all', label: 'Notas', icon: '📝', isActive: filterMode === 'all' && selectedTagIds.length === 0 },
+    { id: 'tags', label: 'Etiquetas', icon: '🏷️', isActive: selectedTagIds.length > 0, badge: selectedTagIds.length || undefined },
+    { id: 'archived', label: 'Archivadas', icon: '📦', isActive: filterMode === 'archived' },
+    { id: 'settings', label: 'Ajustes', icon: '⚙️', isActive: false },
   ];
 
   return (
@@ -65,13 +65,13 @@ export default function BottomNav() {
             </motion.button>
           ))}
 
-          {/* Floating Action Button - Create Note */}
+          {/* Botón Flotante (FAB) - Crear Nota */}
           <div className="absolute -top-6 left-1/2 -translate-x-1/2">
             <motion.button
               whileTap={{ scale: 0.88 }}
               whileHover={{ scale: 1.08 }}
               onClick={() => openEditor()}
-              aria-label="Create Note"
+              aria-label="Crear nueva nota"
               className="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 text-white shadow-xl shadow-blue-500/35 flex items-center justify-center text-3xl border-2 border-white dark:border-zinc-900 group"
             >
               <motion.span

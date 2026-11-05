@@ -20,8 +20,8 @@ export default function Header() {
   const trashedNotes = notes.filter((n) => n.isTrashed);
 
   const getTitle = () => {
-    if (filterMode === 'archived') return 'Archive';
-    if (filterMode === 'trash') return 'Trash';
+    if (filterMode === 'archived') return 'Archivadas';
+    if (filterMode === 'trash') return 'Papelera';
     if (selectedTagIds.length > 0) {
       const activeTagNames = tags
         .filter((t) => selectedTagIds.includes(t.id))
@@ -56,7 +56,7 @@ export default function Header() {
               }}
               className="mr-1 p-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs font-semibold flex items-center gap-1 hover:bg-zinc-200"
             >
-              ← Back
+              ← Volver
             </motion.button>
           ) : null}
 
@@ -68,29 +68,29 @@ export default function Header() {
               )}
             </h1>
             <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
-              {count} {count === 1 ? 'note' : 'notes'}
-              {selectedTagIds.length > 0 && ' (filtered)'}
+              {count} {count === 1 ? 'nota' : 'notas'}
+              {selectedTagIds.length > 0 && ' (filtradas)'}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* View Mode Toggle: Grid vs List */}
+          {/* Alternar modo de vista: Cuadrícula o Lista */}
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={toggleViewMode}
-            title={settings.viewMode === 'grid' ? 'Switch to List View' : 'Switch to Grid View'}
+            title={settings.viewMode === 'grid' ? 'Cambiar a vista de lista' : 'Cambiar a cuadrícula'}
             className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center justify-center text-sm transition-colors"
           >
             {settings.viewMode === 'grid' ? '☰' : '⊞'}
           </motion.button>
 
-          {/* Quick Trash link if in main view */}
+          {/* Acceso directo a la papelera */}
           {filterMode === 'all' && (
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => setFilterMode('trash')}
-              title="Trash Bin"
+              title="Papelera de reciclaje"
               className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center justify-center text-sm transition-colors relative"
             >
               🗑️

@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useStore } from '@/store/useStore';
 import NoteCard from './NoteCard';
 import SearchBar from './SearchBar';
-import { cn } from '@/lib/utils';
 
 export default function NoteGrid() {
   const { getFilteredNotes, openEditor, filterMode, reorderNotes, settings } = useStore();
@@ -56,24 +55,24 @@ export default function NoteGrid() {
 
   return (
     <div className="px-4 sm:px-6 max-w-6xl mx-auto pb-32 pt-3">
-      {/* Search and Tag Carousel */}
+      {/* Buscador y carrusel de etiquetas */}
       <SearchBar />
 
-      {/* Trash notice banner */}
+      {/* Banner de aviso para la papelera */}
       {filterMode === 'trash' && notes.length > 0 && <TrashBanner />}
 
-      {/* Pinned Notes Section */}
+      {/* Sección de notas fijadas */}
       {pinnedNotes.length > 0 && filterMode === 'all' && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3 px-1">
             <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
               <span>📌</span>
-              <span>Pinned Notes</span>
+              <span>Notas Fijadas</span>
               <span className="text-[10px] bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded-full font-semibold ml-1">
                 {pinnedNotes.length}
               </span>
             </h2>
-            <span className="text-[10px] text-zinc-400">Drag to reorder</span>
+            <span className="text-[10px] text-zinc-400">Arrastra para ordenar</span>
           </div>
 
           <div className={gridClasses}>
@@ -94,13 +93,13 @@ export default function NoteGrid() {
         </section>
       )}
 
-      {/* Other Notes Section */}
+      {/* Sección de otras notas */}
       <section>
         {pinnedNotes.length > 0 && filterMode === 'all' && (
           <div className="flex items-center justify-between mb-3 px-1">
             <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5">
               <span>📋</span>
-              <span>All Notes</span>
+              <span>Todas las Notas</span>
               <span className="text-[10px] bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 rounded-full font-semibold ml-1">
                 {otherNotes.length}
               </span>
@@ -126,7 +125,7 @@ export default function NoteGrid() {
           </div>
         ) : null}
 
-        {/* Empty State */}
+        {/* Estado vacío cuando no hay notas */}
         {notes.length === 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -138,17 +137,17 @@ export default function NoteGrid() {
             </div>
             <h3 className="text-base font-bold text-zinc-800 dark:text-zinc-200 mb-1">
               {filterMode === 'archived'
-                ? 'No archived notes yet'
+                ? 'No hay notas archivadas'
                 : filterMode === 'trash'
-                ? 'Trash is empty'
-                : 'No notes found'}
+                ? 'La papelera está vacía'
+                : 'No hay notas aún'}
             </h3>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 max-w-xs mb-6">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 max-w-xs mb-6 leading-relaxed">
               {filterMode === 'archived'
-                ? 'Swipe right on any active note to stash it here for later.'
+                ? 'Desliza una nota activa hacia la derecha para guardarla aquí.'
                 : filterMode === 'trash'
-                ? 'Deleted notes will stay here until emptied.'
-                : 'Tap the glowing + button below to create your first hybrid note!'}
+                ? 'Las notas eliminadas se guardan aquí hasta que vacíes la papelera.'
+                : '¡Toca el botón + inferior para crear tu primera nota híbrida!'}
             </p>
             {filterMode === 'all' && (
               <motion.button
@@ -157,7 +156,7 @@ export default function NoteGrid() {
                 className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/25 flex items-center gap-2"
               >
                 <span>+</span>
-                <span>Create New Note</span>
+                <span>Crear Nueva Nota</span>
               </motion.button>
             )}
           </motion.div>
@@ -180,19 +179,19 @@ function TrashBanner() {
       <div className="flex items-center gap-2">
         <span className="text-lg">⚠️</span>
         <span className="text-xs font-medium text-rose-700 dark:text-rose-300">
-          {trashedCount} items in Trash. Swipe right to restore or left to delete forever.
+          {trashedCount} {trashedCount === 1 ? 'nota en papelera' : 'notas en papelera'}. Desliza a la derecha para restaurar o a la izquierda para borrar definitivamente.
         </span>
       </div>
       <motion.button
         whileTap={{ scale: 0.95 }}
         onClick={() => {
-          if (confirm('Permanently delete all items in trash?')) {
+          if (confirm('¿Eliminar definitivamente todas las notas de la papelera?')) {
             emptyTrash();
           }
         }}
         className="text-xs font-bold text-rose-600 dark:text-rose-400 px-3 py-1.5 rounded-xl bg-rose-100 dark:bg-rose-900/50 hover:bg-rose-200 transition-colors flex-shrink-0"
       >
-        Empty Trash
+        Vaciar Papelera
       </motion.button>
     </motion.div>
   );

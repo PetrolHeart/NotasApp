@@ -20,11 +20,11 @@ export function formatDate(timestamp: number): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
+  if (diffMins < 1) return 'Ahora mismo';
+  if (diffMins < 60) return `Hace ${diffMins} min`;
+  if (diffHours < 24) return `Hace ${diffHours} h`;
+  if (diffDays < 7) return `Hace ${diffDays} d`;
+  return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
 export function cn(...classes: (string | boolean | undefined | null)[]): string {

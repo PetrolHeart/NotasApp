@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'AppNotas — Tactile Mobile Note-Taking PWA',
-  description: 'A mobile-first, tactile note-taking Progressive Web App with hybrid content blocks, interactive checklists, and offline persistence.',
+  title: 'AppNotas — Bloc de Notas Táctil PWA',
+  description: 'Aplicación web progresiva móvil para tomar notas táctiles, listas de tareas interactivas y almacenamiento local sin conexión.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -37,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

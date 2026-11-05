@@ -33,7 +33,7 @@ export default function NoteEditor() {
   const [isPinned, setIsPinned] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
-  // Panels
+  // Paneles flotantes
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [showTagPicker, setShowTagPicker] = useState(false);
   const [newTagName, setNewTagName] = useState('');
@@ -75,7 +75,7 @@ export default function NoteEditor() {
         (b.type === 'checklist' && b.checklistItems && b.checklistItems.length > 0)
     );
 
-    // If blank new note, just close
+    // Si es una nota nueva vacía, solo cerrar
     if (!hasText && !hasBlockContent && !editingNote) {
       closeEditor();
       return;
@@ -125,7 +125,6 @@ export default function NoteEditor() {
 
   const handleRemoveBlock = (blockId: string) => {
     if (blocks.length <= 1) {
-      // Just clear content instead of removing sole block
       setBlocks([{ id: generateId(), type: 'text', content: '', order: 0 }]);
       return;
     }
@@ -204,7 +203,6 @@ export default function NoteEditor() {
     if (!newTagName.trim()) return;
     const randomColor = DEFAULT_TAG_COLORS[tags.length % DEFAULT_TAG_COLORS.length];
     await addTag(newTagName.trim(), randomColor);
-    // Find newly added tag
     const matchingTag = useStore.getState().tags.find((t) => t.name === newTagName.trim());
     if (matchingTag) {
       setSelectedTagIds((prev) => [...prev, matchingTag.id]);
@@ -236,12 +234,12 @@ export default function NoteEditor() {
               theme.textColor || 'text-zinc-900 dark:text-zinc-100'
             )}
           >
-            {/* Top Drag Indicator on Mobile */}
+            {/* Indicador de arrastre en móvil */}
             <div className="flex justify-center pt-2.5 pb-1 sm:hidden">
               <div className="w-12 h-1.5 rounded-full bg-black/15 dark:bg-white/20" />
             </div>
 
-            {/* Navigation & Action Bar */}
+            {/* Barra de Navegación y Acciones */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-black/5 dark:border-white/10">
               <motion.button
                 whileTap={{ scale: 0.92 }}
@@ -249,11 +247,11 @@ export default function NoteEditor() {
                 className="flex items-center gap-1 text-sm font-semibold text-blue-600 dark:text-blue-400 px-2 py-1 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
                 <span>←</span>
-                <span>Save</span>
+                <span>Guardar</span>
               </motion.button>
 
               <div className="flex items-center gap-1 sm:gap-2">
-                {/* Pin Button */}
+                {/* Botón Fijar Nota */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => setIsPinned(!isPinned)}
@@ -263,12 +261,12 @@ export default function NoteEditor() {
                       ? 'bg-amber-400/30 text-amber-600 dark:text-amber-300 font-bold'
                       : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-70'
                   )}
-                  title={isPinned ? 'Pinned to top' : 'Pin note'}
+                  title={isPinned ? 'Nota fijada arriba' : 'Fijar nota'}
                 >
                   📌
                 </motion.button>
 
-                {/* Theme Selector Toggle */}
+                {/* Alternar selector de tema y color */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => {
@@ -281,12 +279,12 @@ export default function NoteEditor() {
                       ? 'bg-black/15 dark:bg-white/20'
                       : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-70'
                   )}
-                  title="Customize Theme & Icon"
+                  title="Personalizar tema e icono"
                 >
                   🎨
                 </motion.button>
 
-                {/* Tags Selector Toggle */}
+                {/* Alternar selector de etiquetas */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => {
@@ -299,18 +297,18 @@ export default function NoteEditor() {
                       ? 'bg-black/15 dark:bg-white/20'
                       : 'hover:bg-black/5 dark:hover:bg-white/10 opacity-70'
                   )}
-                  title="Tag Chips"
+                  title="Etiquetas de la nota"
                 >
                   🏷️
                 </motion.button>
 
-                {/* Delete / Trash Shortcut */}
+                {/* Acceso rápido a eliminar / papelera */}
                 {editingNote && (
                   <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={async () => {
                       if (editingNote.isTrashed) {
-                        if (confirm('Permanently delete this note?')) {
+                        if (confirm('¿Eliminar definitivamente esta nota?')) {
                           await deleteNote(editingNote.id);
                           closeEditor();
                         }
@@ -320,7 +318,7 @@ export default function NoteEditor() {
                       }
                     }}
                     className="w-9 h-9 rounded-xl hover:bg-rose-500/20 text-rose-500 flex items-center justify-center text-sm transition-colors"
-                    title="Send to Trash"
+                    title="Enviar a papelera"
                   >
                     🗑️
                   </motion.button>
@@ -328,7 +326,7 @@ export default function NoteEditor() {
               </div>
             </div>
 
-            {/* Theme & Icon Picker Flyout */}
+            {/* Selector de tema e icono */}
             <AnimatePresence>
               {showThemePicker && (
                 <motion.div
@@ -338,7 +336,7 @@ export default function NoteEditor() {
                   className="px-6 py-3 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/10 overflow-hidden"
                 >
                   <p className="text-[11px] font-bold uppercase tracking-wider opacity-60 mb-2">
-                    Card Background & Accent
+                    Fondo y Color de la Tarjeta
                   </p>
                   <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
                     {DEFAULT_THEMES.map((t, idx) => (
@@ -357,7 +355,7 @@ export default function NoteEditor() {
                   </div>
 
                   <p className="text-[11px] font-bold uppercase tracking-wider opacity-60 mt-2 mb-1.5">
-                    Note Icon Emoji
+                    Icono Emoji
                   </p>
                   <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1">
                     <button
@@ -367,7 +365,7 @@ export default function NoteEditor() {
                         !noteIcon && 'ring-2 ring-blue-500'
                       )}
                     >
-                      None
+                      Ninguno
                     </button>
                     {QUICK_ICONS.map((emoji) => (
                       <button
@@ -384,7 +382,7 @@ export default function NoteEditor() {
                     <input
                       type="text"
                       maxLength={2}
-                      placeholder="Custom"
+                      placeholder="Emoji"
                       value={noteIcon}
                       onChange={(e) => setNoteIcon(e.target.value)}
                       className="w-16 px-2 py-1 text-xs rounded-xl bg-black/5 dark:bg-white/10 text-center outline-none"
@@ -394,7 +392,7 @@ export default function NoteEditor() {
               )}
             </AnimatePresence>
 
-            {/* Tag Selector Flyout */}
+            {/* Selector de Etiquetas */}
             <AnimatePresence>
               {showTagPicker && (
                 <motion.div
@@ -404,7 +402,7 @@ export default function NoteEditor() {
                   className="px-6 py-3 bg-black/5 dark:bg-white/5 border-b border-black/5 dark:border-white/10 overflow-hidden"
                 >
                   <p className="text-[11px] font-bold uppercase tracking-wider opacity-60 mb-2">
-                    Attach Tags
+                    Adjuntar Etiquetas
                   </p>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {tags.map((tag) => {
@@ -438,11 +436,11 @@ export default function NoteEditor() {
                     })}
                   </div>
 
-                  {/* Create tag inline */}
+                  {/* Crear etiqueta directamente */}
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Add new tag name..."
+                      placeholder="Nueva etiqueta..."
                       value={newTagName}
                       onChange={(e) => setNewTagName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleCreateNewTag()}
@@ -452,28 +450,28 @@ export default function NoteEditor() {
                       onClick={handleCreateNewTag}
                       className="px-3 py-1.5 text-xs rounded-xl bg-blue-600 text-white font-semibold"
                     >
-                      Add
+                      Añadir
                     </button>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Title & Realtime Checklist Bar */}
+            {/* Título de la nota y barra de progreso */}
             <div className="px-5 sm:px-8 pt-4 pb-2">
               <div className="flex items-center gap-2 mb-2">
                 {noteIcon && <span className="text-2xl">{noteIcon}</span>}
                 <input
                   ref={titleInputRef}
                   type="text"
-                  placeholder="Note Title..."
+                  placeholder="Título de la nota..."
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full text-xl sm:text-2xl font-black bg-transparent outline-none placeholder-current/30"
                 />
               </div>
 
-              {/* Tag Chips in Header */}
+              {/* Chips de etiquetas en la cabecera */}
               {selectedTagIds.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-1 mb-2">
                   {tags
@@ -490,13 +488,13 @@ export default function NoteEditor() {
                 </div>
               )}
 
-              {/* Real-time Checklist Completion Progress Bar */}
+              {/* Barra de progreso de la lista en tiempo real */}
               {progress.total > 0 && (
                 <div className="pt-2 pb-1">
                   <div className="flex items-center justify-between text-xs font-bold opacity-75 mb-1.5">
-                    <span>Checklist Progress</span>
+                    <span>Progreso de Tareas</span>
                     <span>
-                      {progress.checked}/{progress.total} completed ({progress.percentage}%)
+                      {progress.checked}/{progress.total} completadas ({progress.percentage}%)
                     </span>
                   </div>
                   <div className="w-full h-2 bg-black/10 dark:bg-white/15 rounded-full overflow-hidden">
@@ -512,18 +510,18 @@ export default function NoteEditor() {
               )}
             </div>
 
-            {/* Hybrid Canvas: Blocks Stream */}
+            {/* Lienzo Híbrido: Bloques de Contenido */}
             <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-3 space-y-4">
               {blocks.map((block, blockIndex) => (
                 <div
                   key={block.id}
                   className="relative p-3.5 rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 transition-all group"
                 >
-                  {/* Delete block button */}
+                  {/* Botón para eliminar bloque */}
                   <button
                     onClick={() => handleRemoveBlock(block.id)}
                     className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg bg-black/10 dark:bg-white/10 hover:bg-rose-500 hover:text-white text-xs flex items-center justify-center transition-all"
-                    title="Remove block"
+                    title="Eliminar bloque"
                   >
                     ✕
                   </button>
@@ -531,10 +529,10 @@ export default function NoteEditor() {
                   {block.type === 'text' ? (
                     <div>
                       <div className="text-[10px] uppercase font-bold opacity-40 mb-1">
-                        Text Block {blockIndex + 1}
+                        Párrafo de Texto {blockIndex + 1}
                       </div>
                       <textarea
-                        placeholder="Write your note content here..."
+                        placeholder="Escribe el contenido de tu nota aquí..."
                         value={block.content}
                         onChange={(e) => handleUpdateTextBlock(block.id, e.target.value)}
                         rows={4}
@@ -544,14 +542,14 @@ export default function NoteEditor() {
                   ) : (
                     <div>
                       <div className="flex items-center justify-between text-[10px] uppercase font-bold opacity-40 mb-2">
-                        <span>Interactive Checklist</span>
-                        <span>{block.checklistItems?.length || 0} items</span>
+                        <span>Lista de Tareas Interactiva</span>
+                        <span>{block.checklistItems?.length || 0} elementos</span>
                       </div>
 
                       <div className="space-y-2">
                         {block.checklistItems?.map((item, itemIdx) => (
                           <div key={item.id} className="flex items-center gap-2 group/item">
-                            {/* Checkbox */}
+                            {/* Casilla de verificación */}
                             <motion.button
                               whileTap={{ scale: 0.8 }}
                               onClick={() => handleToggleChecklistItem(block.id, item.id)}
@@ -573,7 +571,7 @@ export default function NoteEditor() {
                               )}
                             </motion.button>
 
-                            {/* Checklist item text input */}
+                            {/* Entrada de texto de tarea */}
                             <input
                               type="text"
                               value={item.text}
@@ -589,31 +587,32 @@ export default function NoteEditor() {
                                   handleRemoveChecklistItem(block.id, item.id);
                                 }
                               }}
-                              placeholder={`List item ${itemIdx + 1}...`}
+                              placeholder={`Elemento ${itemIdx + 1}...`}
                               className={cn(
                                 'flex-1 bg-transparent outline-none text-sm py-0.5 transition-all',
                                 item.checked && 'line-through opacity-50'
                               )}
                             />
 
-                            {/* Remove item button */}
+                            {/* Botón borrar elemento */}
                             <button
                               onClick={() => handleRemoveChecklistItem(block.id, item.id)}
                               className="opacity-0 group-hover/item:opacity-100 text-rose-500 hover:text-rose-700 text-xs px-1"
+                              title="Borrar elemento"
                             >
                               ✕
                             </button>
                           </div>
                         ))}
 
-                        {/* Add Item Button */}
+                        {/* Botón Añadir Elemento */}
                         <motion.button
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleAddChecklistItem(block.id)}
                           className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline pt-1 flex items-center gap-1"
                         >
                           <span>+</span>
-                          <span>Add item (Press Enter)</span>
+                          <span>Añadir elemento (Pulsa Enter)</span>
                         </motion.button>
                       </div>
                     </div>
@@ -622,17 +621,17 @@ export default function NoteEditor() {
               ))}
             </div>
 
-            {/* Hybrid Block Addition Bottom Toolbar */}
+            {/* Barra inferior para añadir bloques */}
             <div className="px-5 sm:px-8 py-3.5 bg-black/[0.04] dark:bg-white/[0.06] border-t border-black/5 dark:border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold opacity-50">Insert Block:</span>
+                <span className="text-xs font-bold opacity-50">Insertar bloque:</span>
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={() => handleAddBlock('text')}
                   className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 shadow-xs border border-black/5 dark:border-white/10 text-xs font-semibold flex items-center gap-1.5 hover:shadow-md transition-all"
                 >
                   <span>📝</span>
-                  <span>Text Paragraph</span>
+                  <span>Párrafo de Texto</span>
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.92 }}
@@ -640,7 +639,7 @@ export default function NoteEditor() {
                   className="px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-800 shadow-xs border border-black/5 dark:border-white/10 text-xs font-semibold flex items-center gap-1.5 hover:shadow-md transition-all"
                 >
                   <span>☑️</span>
-                  <span>Checklist</span>
+                  <span>Lista de Tareas</span>
                 </motion.button>
               </div>
 
@@ -649,7 +648,7 @@ export default function NoteEditor() {
                 onClick={handleSaveAndClose}
                 className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/30 transition-all"
               >
-                Done
+                Listo
               </motion.button>
             </div>
           </motion.div>

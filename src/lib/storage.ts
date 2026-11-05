@@ -33,21 +33,21 @@ export const INITIAL_SETTINGS: AppSettings = {
 };
 
 export const INITIAL_TAGS: Tag[] = [
-  { id: 'tag-work', name: 'Work', color: '#3b82f6' },
+  { id: 'tag-work', name: 'Trabajo', color: '#3b82f6' },
   { id: 'tag-ideas', name: 'Ideas', color: '#8b5cf6' },
-  { id: 'tag-todo', name: 'To-Do', color: '#22c55e' },
-  { id: 'tag-travel', name: 'Travel', color: '#f97316' },
+  { id: 'tag-todo', name: 'Tareas', color: '#22c55e' },
+  { id: 'tag-travel', name: 'Viajes', color: '#f97316' },
 ];
 
 export const INITIAL_NOTES: Note[] = [
   {
     id: 'note-welcome',
-    title: 'Welcome to AppNotas! 🚀',
+    title: '¡Bienvenido a AppNotas! 🚀',
     blocks: [
       {
         id: 'b-welcome-1',
         type: 'text',
-        content: 'Your mobile-first, tactile note-taking Progressive Web App (PWA). Works 100% offline with zero data loss.',
+        content: 'Tu aplicación web progresiva (PWA) de notas táctil y moderna. Funciona 100% sin conexión y con sincronización en tiempo real.',
         order: 0,
       },
       {
@@ -56,11 +56,11 @@ export const INITIAL_NOTES: Note[] = [
         content: '',
         order: 1,
         checklistItems: [
-          { id: 'cl-1', text: 'Swipe right on cards to Archive 📦', checked: false, order: 0 },
-          { id: 'cl-2', text: 'Swipe left to send to Trash 🗑️', checked: false, order: 1 },
-          { id: 'cl-3', text: 'Drag the grip icon to reorder notes ⇅', checked: true, order: 2 },
-          { id: 'cl-4', text: 'Tap + at bottom to create hybrid notes', checked: true, order: 3 },
-          { id: 'cl-5', text: 'Export backups in Settings ⚙️', checked: false, order: 4 },
+          { id: 'cl-1', text: 'Desliza a la derecha para archivar 📦', checked: false, order: 0 },
+          { id: 'cl-2', text: 'Desliza a la izquierda para enviar a la papelera 🗑️', checked: false, order: 1 },
+          { id: 'cl-3', text: 'Arrastra el icono ⠿ para reordenar tus notas ⇅', checked: true, order: 2 },
+          { id: 'cl-4', text: 'Toca el botón + inferior para crear notas híbridas', checked: true, order: 3 },
+          { id: 'cl-5', text: 'Haz copias de seguridad en Ajustes ⚙️', checked: false, order: 4 },
         ],
       },
     ],
@@ -75,12 +75,12 @@ export const INITIAL_NOTES: Note[] = [
   },
   {
     id: 'note-travel',
-    title: 'Weekend Escape Plan 🏔️',
+    title: 'Escapada de Fin de Semana 🏔️',
     blocks: [
       {
         id: 'b-travel-1',
         type: 'text',
-        content: 'Cabin in the woods booked from Friday 4 PM to Sunday evening. Don\'t forget offline maps.',
+        content: 'Cabaña en la sierra reservada de viernes a domingo. No olvidar descargar los mapas sin conexión.',
         order: 0,
       },
       {
@@ -89,10 +89,10 @@ export const INITIAL_NOTES: Note[] = [
         content: '',
         order: 1,
         checklistItems: [
-          { id: 'cl-t1', text: 'Pack hiking boots & warm fleece', checked: true, order: 0 },
-          { id: 'cl-t2', text: 'Download offline trails map', checked: true, order: 1 },
-          { id: 'cl-t3', text: 'Charge camera & powerbanks', checked: false, order: 2 },
-          { id: 'cl-t4', text: 'Snacks and hot cocoa mix', checked: false, order: 3 },
+          { id: 'cl-t1', text: 'Botas de montaña y abrigo térmico', checked: true, order: 0 },
+          { id: 'cl-t2', text: 'Descargar rutas de senderismo offline', checked: true, order: 1 },
+          { id: 'cl-t3', text: 'Cargar cámara de fotos y baterías portátiles', checked: false, order: 2 },
+          { id: 'cl-t4', text: 'Snacks para la ruta y termo de café', checked: false, order: 3 },
         ],
       },
     ],
@@ -107,12 +107,12 @@ export const INITIAL_NOTES: Note[] = [
   },
   {
     id: 'note-project',
-    title: 'Product Roadmap Q4 🎯',
+    title: 'Hoja de Ruta del Proyecto 🎯',
     blocks: [
       {
         id: 'b-proj-1',
         type: 'text',
-        content: 'Focusing on tactile gestures, instant offline sync, and delightful micro-interactions with Framer Motion.',
+        content: 'Priorizar gestos táctiles fluidos, diseño adaptado a móviles y almacenamiento local ultrarrápido.',
         order: 0,
       },
       {
@@ -121,9 +121,9 @@ export const INITIAL_NOTES: Note[] = [
         content: '',
         order: 1,
         checklistItems: [
-          { id: 'cl-p1', text: 'Tailwind CSS fluid styling', checked: true, order: 0 },
-          { id: 'cl-p2', text: 'IndexedDB robust storage layer', checked: true, order: 1 },
-          { id: 'cl-p3', text: 'Vercel one-click deployment ready', checked: true, order: 2 },
+          { id: 'cl-p1', text: 'Estilos modernos con Tailwind CSS', checked: true, order: 0 },
+          { id: 'cl-p2', text: 'Base de datos offline con IndexedDB', checked: true, order: 1 },
+          { id: 'cl-p3', text: 'Despliegue automático en Vercel', checked: true, order: 2 },
         ],
       },
     ],
@@ -257,7 +257,7 @@ export class IndexedDBRepository implements NoteRepository {
   private openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       if (!this.isAvailable()) {
-        return reject(new Error('IndexedDB unavailable'));
+        return reject(new Error('IndexedDB no disponible'));
       }
 
       const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -289,7 +289,6 @@ export class IndexedDBRepository implements NoteRepository {
         req.onsuccess = async () => {
           const result = req.result as Note[];
           if (!result || result.length === 0) {
-            // Seed sample notes for a delightful first-time experience
             await this.saveAllNotes(INITIAL_NOTES);
             resolve(INITIAL_NOTES);
           } else {
@@ -479,42 +478,38 @@ export class SupabaseNoteRepository implements NoteRepository {
   constructor(private supabaseClient?: unknown) {}
 
   async getAllNotes(): Promise<Note[]> {
-    // const { data } = await this.supabaseClient.from('notes').select('*');
-    // return data || [];
-    throw new Error('Supabase integration requires credentials. Swap via useStore.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async getNote(id: string): Promise<Note | undefined> {
-    throw new Error('Supabase integration requires credentials.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async saveNote(note: Note): Promise<void> {
-    throw new Error('Supabase integration requires credentials.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async deleteNote(id: string): Promise<void> {
-    throw new Error('Supabase integration requires credentials.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async saveAllNotes(notes: Note[]): Promise<void> {
-    throw new Error('Supabase integration requires credentials.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async getAllTags(): Promise<Tag[]> {
-    throw new Error('Supabase integration requires credentials.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async saveTags(tags: Tag[]): Promise<void> {
-    throw new Error('Supabase integration requires credentials.');
+    throw new Error('La integración con Supabase requiere credenciales.');
   }
 
   async getSettings(): Promise<AppSettings> {
     return INITIAL_SETTINGS;
   }
 
-  async saveSettings(settings: AppSettings): Promise<void> {
-    // Save to user metadata
-  }
+  async saveSettings(settings: AppSettings): Promise<void> {}
 
   async exportAll(): Promise<string> {
     return JSON.stringify({ notes: [], tags: [], settings: INITIAL_SETTINGS });

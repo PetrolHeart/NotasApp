@@ -50,16 +50,16 @@ export default function TagManagerModal() {
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-3xl max-h-[85vh] flex flex-col overflow-hidden border border-zinc-200/50 dark:border-zinc-800 shadow-2xl"
           >
-            {/* Grab Handle */}
+            {/* Manija de arrastre */}
             <div className="flex justify-center pt-3 pb-1 sm:hidden">
               <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
             </div>
 
-            {/* Header */}
+            {/* Cabecera */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2">
                 <span className="text-xl">🏷️</span>
-                <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Filter by Tags</h2>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Filtrar por Etiquetas</h2>
               </div>
               <div className="flex items-center gap-2">
                 {selectedTagIds.length > 0 && (
@@ -68,7 +68,7 @@ export default function TagManagerModal() {
                     onClick={clearTagFilter}
                     className="text-xs font-semibold text-rose-500 hover:text-rose-600 px-2 py-1"
                   >
-                    Clear Filter
+                    Borrar Filtro
                   </motion.button>
                 )}
                 <motion.button
@@ -82,10 +82,10 @@ export default function TagManagerModal() {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-6">
-              {/* Filter Chips List */}
+              {/* Lista de etiquetas */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-3">
-                  Select Tags to Filter Canvas
+                  Selecciona etiquetas para filtrar el lienzo
                 </p>
                 <div className="grid grid-cols-2 gap-2.5">
                   <motion.button
@@ -97,7 +97,7 @@ export default function TagManagerModal() {
                         : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200/60 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300'
                     }`}
                   >
-                    <span className="text-sm">🌟 All Notes</span>
+                    <span className="text-sm">🌟 Todas las notas</span>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10 font-medium">
                       {notes.filter((n) => !n.isTrashed).length}
                     </span>
@@ -144,7 +144,7 @@ export default function TagManagerModal() {
                             removeTag(tag.id);
                           }}
                           className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
-                          title="Delete tag"
+                          title="Eliminar etiqueta"
                         >
                           ✕
                         </button>
@@ -154,16 +154,16 @@ export default function TagManagerModal() {
                 </div>
               </div>
 
-              {/* Add New Tag */}
+              {/* Crear Nueva Etiqueta */}
               <div className="bg-zinc-50 dark:bg-zinc-800/40 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-700/50">
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
-                  Create New Tag
+                  Crear Nueva Etiqueta
                 </p>
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="e.g. Finance, Reading..."
+                      placeholder="Ej. Finanzas, Lectura, Gimnasio..."
                       value={newTagName}
                       onChange={(e) => setNewTagName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
@@ -175,11 +175,11 @@ export default function TagManagerModal() {
                       disabled={!newTagName.trim()}
                       className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium text-sm transition-colors shadow-sm"
                     >
-                      Add
+                      Añadir
                     </motion.button>
                   </div>
 
-                  {/* Color Palette */}
+                  {/* Paleta de Color */}
                   <div className="flex items-center gap-2 pt-1">
                     <span className="text-xs text-zinc-400">Color:</span>
                     <div className="flex gap-2 overflow-x-auto py-1">
@@ -204,4 +204,3 @@ export default function TagManagerModal() {
     </AnimatePresence>
   );
 }
-

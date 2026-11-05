@@ -16,7 +16,7 @@ export default function SearchBar() {
 
   return (
     <div className="mb-5">
-      {/* Search Input Box */}
+      {/* Caja de Entrada de Búsqueda */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -24,7 +24,7 @@ export default function SearchBar() {
       >
         <input
           type="text"
-          placeholder="Search notes, checklists, tags..."
+          placeholder="Buscar notas, listas, etiquetas..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full px-4 py-3 pl-11 pr-10 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/80 backdrop-blur-md text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 outline-none border border-zinc-200/50 dark:border-zinc-750 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-xs"
@@ -45,10 +45,10 @@ export default function SearchBar() {
         )}
       </motion.div>
 
-      {/* Tag Filter Carousel */}
+      {/* Carrusel de Filtro por Etiquetas */}
       {tags.length > 0 && (
         <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto pb-1 scrollbar-hide text-xs">
-          {/* Quick All / Clear Tag Filter */}
+          {/* Todas las notas */}
           <motion.button
             whileTap={{ scale: 0.92 }}
             onClick={clearTagFilter}
@@ -58,10 +58,10 @@ export default function SearchBar() {
                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
             }`}
           >
-            <span>All</span>
+            <span>Todas</span>
           </motion.button>
 
-          {/* Individual Tag Chips */}
+          {/* Chips de etiquetas */}
           {tags.map((tag) => {
             const isSelected = selectedTagIds.includes(tag.id);
             return (
@@ -86,14 +86,14 @@ export default function SearchBar() {
             );
           })}
 
-          {/* Manage Tags Button */}
+          {/* Botón Gestionar Etiquetas */}
           <motion.button
             whileTap={{ scale: 0.92 }}
             onClick={openTagModal}
             className="px-2.5 py-1 rounded-full font-semibold whitespace-nowrap bg-zinc-100 dark:bg-zinc-800/60 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
-            title="Manage Tags"
+            title="Gestionar etiquetas"
           >
-            + Tags
+            + Etiquetas
           </motion.button>
         </div>
       )}

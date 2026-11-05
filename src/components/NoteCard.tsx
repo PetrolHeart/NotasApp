@@ -37,7 +37,7 @@ export default function NoteCard({
   const x = useMotionValue(0);
   const [swiping, setSwiping] = useState(false);
 
-  // Dynamic transforms for tactile swipe feedback
+  // Transformaciones dinámicas para feedback táctil de deslizamiento
   const rightBg = useTransform(
     x,
     [0, SWIPE_THRESHOLD],
@@ -74,13 +74,13 @@ export default function NoteCard({
   };
 
   const getRightSwipeLabel = () => {
-    if (note.isArchived || note.isTrashed) return { icon: '↩️', label: 'Restore' };
-    return { icon: '📦', label: 'Archive' };
+    if (note.isArchived || note.isTrashed) return { icon: '↩️', label: 'Restaurar' };
+    return { icon: '📦', label: 'Archivar' };
   };
 
   const getLeftSwipeLabel = () => {
-    if (note.isTrashed) return { icon: '🔥', label: 'Delete' };
-    return { icon: '🗑️', label: 'Trash' };
+    if (note.isTrashed) return { icon: '🔥', label: 'Eliminar' };
+    return { icon: '🗑️', label: 'Papelera' };
   };
 
   const rightAction = getRightSwipeLabel();
@@ -97,7 +97,7 @@ export default function NoteCard({
         isDragOver && 'ring-2 ring-blue-500 scale-[1.02] shadow-xl'
       )}
     >
-      {/* Swipe Right Background Action */}
+      {/* Acción de fondo al deslizar a la derecha */}
       <motion.div
         className="absolute inset-0 rounded-3xl flex items-center justify-start px-6 z-0"
         style={{ backgroundColor: rightBg }}
@@ -111,7 +111,7 @@ export default function NoteCard({
         </motion.div>
       </motion.div>
 
-      {/* Swipe Left Background Action */}
+      {/* Acción de fondo al deslizar a la izquierda */}
       <motion.div
         className="absolute inset-0 rounded-3xl flex items-center justify-end px-6 z-0"
         style={{ backgroundColor: leftBg }}
@@ -125,7 +125,7 @@ export default function NoteCard({
         </motion.div>
       </motion.div>
 
-      {/* Main Draggable & Swipeable Card Surface */}
+      {/* Superficie de tarjeta deslizable y arrastrable */}
       <motion.div
         style={{ x }}
         drag="x"
@@ -149,14 +149,14 @@ export default function NoteCard({
           note.theme.textColor || 'text-zinc-900 dark:text-zinc-100'
         )}
       >
-        {/* Card Header: Reorder Handle, Title, and Pin */}
+        {/* Cabecera de tarjeta: Manija de reorden, título y fijar */}
         <div>
           <div className="flex items-start justify-between gap-2 mb-1.5">
             <div className="flex items-center gap-1.5 flex-1 min-w-0">
-              {/* Drag Handle Indicator */}
+              {/* Indicador para arrastrar y reordenar */}
               <span
                 className="opacity-25 hover:opacity-80 transition-opacity cursor-grab text-xs leading-none select-none flex-shrink-0"
-                title="Drag to reorder"
+                title="Arrastrar para reordenar"
               >
                 ⠿
               </span>
@@ -170,7 +170,7 @@ export default function NoteCard({
               )}
             </div>
 
-            {/* Pin Toggle Button */}
+            {/* Botón para fijar o desfijar nota */}
             {filterMode === 'all' && (
               <motion.button
                 whileTap={{ scale: 0.8 }}
@@ -184,25 +184,25 @@ export default function NoteCard({
                     ? 'bg-amber-400/25 text-amber-600 dark:text-amber-300'
                     : 'opacity-0 group-hover:opacity-60 hover:bg-black/5 dark:hover:bg-white/10'
                 )}
-                title={note.isPinned ? 'Unpin note' : 'Pin to top'}
+                title={note.isPinned ? 'Desfijar de arriba' : 'Fijar nota arriba'}
               >
                 📌
               </motion.button>
             )}
           </div>
 
-          {/* Note Text Preview */}
+          {/* Vista previa de texto */}
           {preview && (
             <p className="text-xs sm:text-[13px] opacity-75 line-clamp-3 leading-relaxed mb-3">
               {preview}
             </p>
           )}
 
-          {/* Interactive Checklist Progress Indicator */}
+          {/* Barra de progreso interactiva */}
           {progress.total > 0 && (
             <div className="my-2.5 bg-black/5 dark:bg-white/10 p-2 rounded-xl">
               <div className="flex items-center justify-between text-[11px] font-semibold opacity-75 mb-1.5">
-                <span>Checklist</span>
+                <span>Lista de tareas</span>
                 <span>
                   {progress.checked}/{progress.total} ({progress.percentage}%)
                 </span>
@@ -224,7 +224,7 @@ export default function NoteCard({
           )}
         </div>
 
-        {/* Card Footer: Tag Chips & Timestamp */}
+        {/* Pie de tarjeta: Chips de etiquetas y fecha */}
         <div className="pt-2 mt-auto border-t border-black/5 dark:border-white/5 flex flex-col gap-2">
           {note.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
@@ -243,7 +243,7 @@ export default function NoteCard({
           <div className="flex items-center justify-between text-[10px] opacity-50 font-medium">
             <span>{formatDate(note.updatedAt)}</span>
             <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px]">
-              Swipe ↔
+              Deslizar ↔
             </span>
           </div>
         </div>

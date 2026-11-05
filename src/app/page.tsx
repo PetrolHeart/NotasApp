@@ -44,7 +44,7 @@ export default function Home() {
           📒
         </motion.div>
         <p className="text-xs font-semibold text-zinc-400 tracking-wider uppercase animate-pulse">
-          Loading AppNotas...
+          Cargando AppNotas...
         </p>
       </div>
     );

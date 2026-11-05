@@ -1,7 +1,7 @@
 {
   "name": "AppNotas",
   "short_name": "AppNotas",
-  "description": "Tactile, mobile-first note-taking Progressive Web App with hybrid content blocks, checklists, and offline sync.",
+  "description": "Aplicación web progresiva táctil para tomar notas con bloques híbridos, listas de tareas y sincronización sin conexión.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
